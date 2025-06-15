@@ -1,0 +1,29 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow p-4 w-100" style="max-width: 500px;">
+        <h3 class="text-center mb-4">Ваш Финансовый Баланс</h3>
+        <ul class="list-group mb-4">
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Доход за все время:</span>
+                <strong>{{ total_income }} ₸</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Траты за все время:</span>
+                <strong>{{ total_expense }} ₸</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Разница:</span>
+                <strong>{{ balance }} ₸</strong>
+            </li>
+        </ul>
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'income:income_add' %}" class="btn btn-success w-48">Добавить доход</a>
+            <a href="{% url 'expense:expense_add' %}" class="btn btn-danger w-48">Добавить трату</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,13 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Transaction list{% endblock title %}
+{% block content %}
+    <div>
+        {% for transaction in transactions  %}
+            <p>{{ transaction.name }} {{ transaction.price }}</p>
+        {% endfor %}
+        {% for income in incomes %}
+            <p> test {{ income.amount }}</p>
+        {% endfor %}
+    </div>
+{% endblock content %}
