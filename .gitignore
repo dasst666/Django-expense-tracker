@@ -8,3 +8,16 @@ __pycache__/
 
 db.sqlite3
 media/
+
+# Python cache
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Editor configs
+*.swp
+*.swo
+
+# Mac OS
+.DS_Store

@@ -14,7 +14,6 @@ class IncomeForm(forms.ModelForm):
             ),
             'amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
-            'note': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
 class IncomeCategoryForm(forms.ModelForm):

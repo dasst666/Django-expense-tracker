@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from django.views.generic import ListView, CreateView
-from .models import Expense
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from .models import Expense, ExpenseCategory
 from django.db.models import Sum
-from .forms import ExpenseForm
+from .forms import ExpenseForm, ExpenseCategoryForm
 from django.urls import reverse_lazy
 
 
@@ -36,6 +36,43 @@ class ExpenseCreateView(CreateView):
 
     def form_valid(self, form):
         return super().form_valid(form)
+
+class ExpenseCategoryCreateView(CreateView):
+    model = ExpenseCategory
+    form_class = ExpenseCategoryForm
+    template_name = "expense/expense_category_form.html"
+    success_url = reverse_lazy('expense:expense_category_add')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = 'Add Expense Category'
+        return context
+    
+    def form_valid(self, form):
+        return super().form_valid(form)
+    
+class ExpenseDeleteView(DeleteView):
+    model = Expense
+    template_name = "expense/expense_confirm_delete.html"
+    success_url = reverse_lazy('expense:expense_list')
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['title'] = f"Delete Expense: {self.object.description[:20] or self.object.category.name}"
+    #     return context
+
+class ExpenseUpdateView(UpdateView):
+    model = Expense
+    form_class = ExpenseForm
+    template_name = "expense/expense_form.html"
+    success_url = reverse_lazy('expense:expense_update')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Edit Expense: {self.object}'
+        return context
+
+
      
     
 

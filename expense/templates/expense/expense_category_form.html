@@ -1,0 +1,25 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Кнопка "Назад" -->
+    <div class="mb-4">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+    </div>
+    <h2 class="text-center mb-4">{{ title }}</h2>
+    <form action="{{ request.path }}" method="post" class="mx-auto" style="max-width: 500px;">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_name" class="form-label form-stylereg">Category</label>
+            <input type="text" class="form-control form-stylereg" id="id_name"
+            value="{% if form.expense.name.value %}{{ form.expense.name.value }}{% endif %}"
+            name="name" placeholder="Your Category" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+    </form>
+</div>
+{% endblock content %}
+

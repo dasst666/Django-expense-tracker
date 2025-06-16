@@ -1,6 +1,24 @@
 {% extends 'main/base.html' %}
 {% load static %}
-{% block title %}{% endblock title %}
+{% block title %}<div class="container mt-5">
+    <h2 class="text-center mb-4">Траты по месяцам</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Месяц</th>
+                <th>Сумма</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in monthly_data %}
+                <tr>
+                    <td>{{ row.month|date:"F Y" }}</td>
+                    <td>{{ row.total }} ₸</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>{% endblock title %}
 
 {% block content %}
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
@@ -19,11 +37,44 @@
                 <span>Разница:</span>
                 <strong>{{ balance }} ₸</strong>
             </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <span>За последние 7 дней:</span>
+                <strong>{{ total_last_7_days_expenses }}₸</strong>
+            </li>
         </ul>
         <div class="d-flex justify-content-between">
             <a href="{% url 'income:income_add' %}" class="btn btn-success w-48">Добавить доход</a>
             <a href="{% url 'expense:expense_add' %}" class="btn btn-danger w-48">Добавить трату</a>
         </div>
     </div>
+</div>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+<canvas id="monthlyChart"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('monthlyChart');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels|safe }},
+            datasets: [{
+                label: 'Сумма трат по месяцам',
+                data: {{ data|safe }},
+                backgroundColor: 'rgba(75, 192, 192, 0.6)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 100000
+                    }
+                }
+            }
+        }
+    });
+</script>
 </div>
 {% endblock content %}

@@ -25,7 +25,7 @@
             <label for="{{ form.note.id_for_label }}" class="form-label">Комментарий</label>
             <input type="text" class="form-control form-stylereg" id="id_note"
             value="{% if form.income.note.value %}{{ form.income.note.value }}{% endif %}"
-            name="note" placeholder="Your Note" required>
+            name="note" placeholder="Your Note">
         </div>
         <button type="submit" class="btn btn-primary w-100">Сохранить</button>
     </form>

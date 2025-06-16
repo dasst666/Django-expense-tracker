@@ -25,6 +25,16 @@
                         <td>{{ expense.date|date:"Y-m-d H:i" }}</td>
                         <td>{{ expense.category.name }}</td>
                         <td>{{ expense.note|default:"—" }}</td>
+                        <td>
+                            <a href="{% url 'expense:expense_delete' expense.pk %}" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'expense:expense_update' expense.pk %}" class="btn btn-sm btn-outline-warning" title="Изменить">
+                                <i class="bi bi-pen"></i>
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
