@@ -43,12 +43,13 @@ class IncomeDeleteView(DeleteView):
 
 class IncomeUpdateView(UpdateView):
     model = Income
+    form_class = IncomeForm
     template_name = "income/income_form.html"
-    success_url = reverse_lazy('income:income_update')
+    success_url = reverse_lazy('income:income_list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'Edit Income: {self.object}'
+        context['title'] = f'Изменить? {self.object.category} {self.object.amount}'
         return context
 
 

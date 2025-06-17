@@ -69,7 +69,7 @@ class ExpenseUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'Edit Expense: {self.object}'
+        context['title'] = f'Edit Expense: {self.object.category} {self.object.amount}'
         return context
 
 

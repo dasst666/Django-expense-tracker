@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Ваши траты</h2>
+    <h2 class="text-center mb-4">Ваши расходы</h2>
     
     {% if expenses %}
         <div class="table-responsive">
@@ -16,6 +16,9 @@
                         <th scope="col">Дата</th>
                         <th scope="col">Категория</th>
                         <th scope="col">Комментарий</th>
+                        <th scope="col">Удалить</th>
+                        <th scope="col">Изменить</th>
+
                     </tr>
                 </thead>
                 <tbody>
