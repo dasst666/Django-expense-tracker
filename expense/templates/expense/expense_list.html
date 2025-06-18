@@ -5,6 +5,8 @@
 
 {% block content %}
 <div class="container mt-5">
+    <a href="{% url "expense:expense_category_pie" %}">Расходы по категориям</a>
+    <a href="{% url "expense:expense_monthly" %}">Расходы по месяцам</a>
     <h2 class="text-center mb-4">Ваши расходы</h2>
     
     {% if expenses %}

@@ -3,6 +3,12 @@
 
 {% block content %}
 <div class="container mt-5">
+    <!-- Кнопка "Назад" -->
+    <div class="mb-4">
+        <a href="{% url "main:dashboard_view" %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+    </div>
     <h2 class="text-center mb-4">{{ title }}</h2>
     {{ form.media }}
     <form action="{{ request.path }}" method="post" class="mx-auto" style="max-width: 500px;">

@@ -7,7 +7,7 @@ from expense.models import Expense
 from django.db.models import Sum
 from django.views.generic import TemplateView
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.db.models.functions import TruncMonth
 import calendar
 
@@ -39,31 +39,11 @@ class DashboardView(TemplateView):
         last_7_days = timezone.now() - timedelta(days=7)
         last_7_days_expenses = Expense.objects.filter(date__gte=last_7_days)
 
-        # expenses for last months
-        monthly_data = (
-            Expense.objects
-            .annotate(month=TruncMonth('date'))
-            .values('month')
-            .annotate(total=Sum('amount'))
-            .order_by('month')
-        )
-        labels = []
-        data = []
-        for entry in monthly_data:
-            month_date = entry['month']
-            month_name = calendar.month_name[month_date.month]
-            labels.append(month_name)
-            data.append(float(entry['total']))
-
-
         total_last_7_days_expenses = last_7_days_expenses.aggregate(total=Sum('amount'))['total'] or 0
         total_income = Income.objects.aggregate(total=Sum('amount'))['total'] or 0
         total_expense = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
         balance = total_income - total_expense
 
-        context['labels'] = labels
-        context['data'] = data
-        context['monthly_data'] = monthly_data
         context['total_last_7_days_expenses'] = total_last_7_days_expenses
         context["total_income"] = total_income
         context["total_expense"] = total_expense

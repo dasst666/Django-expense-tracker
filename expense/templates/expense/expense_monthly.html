@@ -1,0 +1,45 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <h3 class="text-center mb-3">Ваша траты в среднем за месяц</h3>
+    <div class="border rounded px-3 py-2 bg-light text-dark fw-bold fs-5 shadow">
+      {{ avg_year_expenses }} ₸
+    </div>
+</div>
+<div class="container d-flex justify-content-between align-items-center mb-4">
+    <a href="javascript:history.back()" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <h2 class="text-center flex-grow-1 m-0">Расходы по месяцам</h2>
+</div>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <canvas id="monthlyChart"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('monthlyChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ labels|safe }},
+                datasets: [{
+                    label: 'Сумма трат по месяцам',
+                    data: {{ data|safe }},
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 100000
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    </div>
+{% endblock content %}
