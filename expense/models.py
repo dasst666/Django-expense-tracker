@@ -37,4 +37,15 @@ class Expense(models.Model):
     
     # def get_absolute_url(self):
     #     return reverse("model_detail", kwargs={"pk": self.pk})
+
+class ExpenseCategoryLimit(models.Model):
+    category = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE, related_name='limits')
+    month = models.DateField()
+    limit = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    class Meta:
+        unique_together = ['category', 'month']
+    
+    def __str__(self):
+        return f"{self.category.name} - {self.month}: {self.limit}"
     

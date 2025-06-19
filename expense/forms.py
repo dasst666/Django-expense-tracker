@@ -1,5 +1,5 @@
 from django import forms
-from .models import Expense, ExpenseCategory
+from .models import Expense, ExpenseCategory, ExpenseCategoryLimit
 from bootstrap_datepicker_plus.widgets import DatePickerInput
 
 class ExpenseForm(forms.ModelForm):
@@ -20,3 +20,8 @@ class ExpenseCategoryForm(forms.ModelForm):
     class Meta:
         model = ExpenseCategory
         fields = ['name']
+
+class ExpenseCategoryLimitForm(forms.ModelForm):
+    class Meta:
+        model = ExpenseCategoryLimit
+        fields = ['category', 'limit']

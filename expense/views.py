@@ -1,12 +1,15 @@
 from django.shortcuts import render
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
-from .models import Expense, ExpenseCategory
+from .models import Expense, ExpenseCategory, ExpenseCategoryLimit
 from django.db.models import Sum
-from .forms import ExpenseForm, ExpenseCategoryForm
+from .forms import ExpenseForm, ExpenseCategoryForm, ExpenseCategoryLimitForm
 from django.urls import reverse_lazy
 from datetime import timedelta, datetime, date
 from django.db.models.functions import TruncMonth
 import calendar
+from django.utils.timezone import now
+from django.contrib import messages
+from django.shortcuts import redirect
 
 
 class ExpenseListView(ListView):
@@ -162,10 +165,85 @@ class ExpenseMonthlyView(TemplateView):
         context['data'] = data
         return context
 
-def avg_year_expenses(requset):
-    expenses = Expense.objects.all()
+class ExpenseCategoryLimitCreateView(CreateView):
+    model = ExpenseCategoryLimit
+    template_name = "expense/expense_category_limit_form.html"
+    form_class = ExpenseCategoryLimitForm
+    success_url = reverse_lazy('expense:expense_limit_add')
 
-    avg_year_expense = expenses/ month
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        today = now().date()
+        instance.month = today.replace(day=1)
+
+        # If category limit exist
+        exists = ExpenseCategoryLimit.objects.filter(
+            category=instance.category,
+            month=instance.month
+        ).exists()
+        if exists:
+            messages.error(self.request, f"Лимит на категорию {instance.category} за этот месяц уже установлен.")
+            return redirect('expense:expense_limit_add') 
+        return super().form_valid(form)
+
+class ExpenseCategoryLimitStatusView(TemplateView):
+    model = ExpenseCategoryLimit
+    template_name = "expense/expense_category_limit_list.html"
+    success_url = reverse_lazy('expense:expense_limit')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        today = now().date()
+        year = today.year
+        month = today.month
+
+        limits = ExpenseCategoryLimit.objects.filter(month__year=year, month__month=month)
+
+        expenses = (
+            Expense.objects
+            .filter(date__year=year, date__month=month)
+            .values('category')
+            .annotate(total_spent=Sum('amount'))
+        )
+        expense_dict = {item['category']: item['total_spent'] for item in expenses}
+        
+        category_statuses = []
+        for limit in limits:
+            spent = expense_dict.get(limit.category.id, 0)
+            percent = round((spent/limit.limit) * 100) if limit.limit else 0
+            category_statuses.append({
+                'category': limit.category.name,
+                'limit': limit.limit,
+                'spent': spent,
+                'percent': percent,
+                'limit_obj': limit 
+            })
+
+        context['category_statuses'] = category_statuses
+        return context
+    
+class ExpenseCategoryLimitUpdateView(UpdateView):
+    model = ExpenseCategoryLimit
+    form_class = ExpenseCategoryLimitForm
+    template_name = "expense/expense_category_limit_form.html"
+    success_url = reverse_lazy('expense:expense_limit')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = f'Edit expense category limit {self.object.category} {self.object.limit}'
+        return context
+
+class ExpenseCategoryLimitDeleteView(DeleteView):
+    model = ExpenseCategoryLimit
+    template_name = "expense/expense_category_limit_confirm_delete.html"
+    success_url = reverse_lazy('expense:expense_limit')
+
+
+    
+
+    
+
 
 
 

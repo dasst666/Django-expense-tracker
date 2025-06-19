@@ -5,8 +5,14 @@
 
 {% block content %}
 <div class="container mt-5">
-    <a href="{% url "expense:expense_category_pie" %}">Расходы по категориям</a>
-    <a href="{% url "expense:expense_monthly" %}">Расходы по месяцам</a>
+    <div class="d-flex justify-content-center gap-3 mb-4">
+        <a href="{% url 'expense:expense_category_pie' %}" class="btn btn-outline-primary d-flex align-items-center">
+            <i class="bi bi-pie-chart-fill me-2"></i> Расходы по категориям
+        </a>
+        <a href="{% url 'expense:expense_monthly' %}" class="btn btn-outline-success d-flex align-items-center">
+            <i class="bi bi-calendar3 me-2"></i> Расходы по месяцам
+        </a>
+    </div>
     <h2 class="text-center mb-4">Ваши расходы</h2>
     
     {% if expenses %}

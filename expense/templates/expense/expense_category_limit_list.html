@@ -1,0 +1,48 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Лимиты по категориям</h4>
+        <a href="{% url 'expense:expense_limit_add' %}" class="btn btn-outline-primary d-flex align-items-center">
+            <i class="bi bi-plus-lg me-2"></i> Добавить лимит
+        </a>
+    </div>
+{% for item in category_statuses %}
+<div class="mb-3">
+    <strong>{{ item.category }}</strong>
+    <div class="text-muted small">{{ item.spent }} ₸ из {{ item.limit }} ₸</div>
+    
+    <div class="position-relative" style="height: 20px;">
+        <div class="progress" style="height: 100%;">
+            <div class="progress-bar 
+                {% if item.percent >= 100 %}bg-danger
+                {% elif item.percent >= 80 %}bg-warning
+                {% else %}bg-success
+                {% endif %}" 
+                role="progressbar" 
+                style="width: {{ item.percent }}%;" 
+                aria-valuenow="{{ item.percent }}" 
+                aria-valuemin="0" 
+                aria-valuemax="100">
+            </div>
+        </div>
+        <div class="position-absolute top-50 start-50 translate-middle fw-bold small 
+                        {% if item.percent >= 50 %}text-white{% else %}text-dark{% endif %}"
+                 style="pointer-events: none;">
+                {{ item.percent }}%
+        </div>
+    </div>
+    <div>
+        <a href="{% url 'expense:expense_limit_update' item.limit_obj.pk %}" class="btn btn-sm btn-outline-warning mt-2" title="Изменить">
+            <i class="bi bi-pen"></i> Изменить
+        </a>
+        <a href="{% url 'expense:expense_limit_delete' item.limit_obj.pk %}"
+            class="btn btn-sm btn-outline-danger mt-2" title="Удалить">
+            <i class="bi bi-trash"></i>
+        </a>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% endblock content %}  
