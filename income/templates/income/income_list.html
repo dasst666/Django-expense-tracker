@@ -5,8 +5,12 @@
 
 {% block content %}
 <div class="container mt-5">
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'income:income_monthly' %}" class="btn btn-outline-success d-flex align-items-center">
+            <i class="bi bi-calendar3 me-2"></i> Доходы по месяцам
+        </a>
+    </div>
     <h2 class="text-center mb-4">Ваши доходы</h2>
-    
     {% if incomes %}
         <div class="table-responsive">
             <table class="table table-bordered table-hover text-center align-middle">

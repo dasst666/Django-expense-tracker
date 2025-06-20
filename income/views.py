@@ -1,9 +1,13 @@
 from django.shortcuts import render
-from django.views.generic import ListView, CreateView, DeleteView, UpdateView
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView, TemplateView
 from .models import Income
 from django.db.models import Sum
 from django.urls import reverse_lazy
 from .forms import IncomeForm, IncomeCategoryForm
+from datetime import date
+from django.db.models.functions import TruncMonth
+import calendar
+
 
 class IncomeListView(ListView):
     model = Income
@@ -51,6 +55,45 @@ class IncomeUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['title'] = f'Изменить? {self.object.category} {self.object.amount}'
         return context
+
+class IncomeMonthlyView(TemplateView):
+    model = Income
+    template_name = "income/income_monthly.html"
+    success_url = reverse_lazy('income:income_monthly')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        current_year = date.today().year
+        income = Income.objects.filter(date__year=current_year)
+        monthly_incomes = (
+            income
+            .annotate(month=TruncMonth('date'))
+            .values('month')
+            .annotate(total=Sum('amount'))
+        )
+        total_year_incomes = sum(item['total'] for item in monthly_incomes)
+        month_count = len(monthly_incomes)
+        avg_year_incomes = round(total_year_incomes/month_count, 2) if month_count > 0 else 0
+
+        monthly_incomes_for_plot = (
+            monthly_incomes
+            .order_by('month')
+        )
+        labels = []
+        data = []
+        for entry in monthly_incomes_for_plot:
+            month_date = entry['month']
+            month_name = calendar.month_name[month_date.month]
+            labels.append(month_name)
+            data.append(float(entry['total']))
+
+        context['avg_year_incomes'] = avg_year_incomes
+        context['monthly_incomes_for_plot'] = monthly_incomes_for_plot
+        context['labels'] = labels
+        context['data'] = data
+        return context
+    
 
 
     

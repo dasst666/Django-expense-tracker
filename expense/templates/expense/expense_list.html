@@ -13,6 +13,19 @@
             <i class="bi bi-calendar3 me-2"></i> Расходы по месяцам
         </a>
     </div>
+    <form method="get" class="mb-4 d-flex justify-content-center" style="max-width: 400px; margin: auto;">
+        <div class="input-group">
+            <label class="input-group-text" for="categorySelect">Фильтрация по категориям</label>
+            <select class="form-select" name="category" id="categorySelect" onchange="this.form.submit()">
+                <option value="">Все категории</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category.id|stringformat:"s" == request.GET.category %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
     <h2 class="text-center mb-4">Ваши расходы</h2>
     
     {% if expenses %}
@@ -59,23 +72,25 @@
         <ul class="pagination">
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&category={{ request.GET.category }}">Previous</a>
                 </li>
             {% else %}
                 <li class="page-item disabled"><span class="page-link">Previous</span></li>
             {% endif %}
-
+        
             {% for num in page_obj.paginator.page_range %}
                 {% if page_obj.number == num %}
                     <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&category={{ request.GET.category }}">{{ num }}</a>
+                    </li>
                 {% endif %}
             {% endfor %}
-
+        
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&category={{ request.GET.category }}">Next</a>
                 </li>
             {% else %}
                 <li class="page-item disabled"><span class="page-link">Next</span></li>

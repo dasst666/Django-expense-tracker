@@ -25,3 +25,11 @@ class ExpenseCategoryLimitForm(forms.ModelForm):
     class Meta:
         model = ExpenseCategoryLimit
         fields = ['category', 'limit']
+
+class ExpenseCategoryFilterForm(forms.Form):
+    category = forms.ModelChoiceField(
+        queryset=ExpenseCategory.objects.all(),
+        required=False,
+        empty_label="Все категории",
+        label = ""
+    )

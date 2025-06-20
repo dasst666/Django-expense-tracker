@@ -6,20 +6,32 @@
         <a href="{% url "expense:expense_list" %}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i>
         </a>
-        <h2 class="text-center flex-grow-1 m-0">Текущий месяц: 
+        <h2 class="text-center flex-grow-1 m-0">Ваши траты за 
             {% for value, label in month_options %}
                 {% if value == selected_month %}
                     {{ label }}
                 {% endif %}
             {% endfor %}</h2>
     </div>
-    <div class="d-flex flex-column justify-content-center align-items-center">
-        <h3 class="text-center mb-3">Ваша траты в среднем за день</h3>
-        <div class="border rounded px-3 py-2 bg-light text-dark fw-bold fs-5 shadow">
-        {{ avg_daily_expenses }} ₸
+    <div class="d-flex text-center justify-content-center">
+        <div class="d-flex justify-content-center mb-5">
+            <div class="card shadow-sm text-center" style="min-width: 300px;">
+                <div class="card-body">
+                    <h5 class="text-muted text-center flex-grow-1 m-0">Ваши траты за месяц</h5>
+                    <p class="fs-4 fw-bold text-success m-0">{{ total_monthly_expense }} ₸</p>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center mb-5">
+            <div class="card shadow-sm text-center" style="min-width: 300px;">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Средние траты в день</h5>
+                    <p class="fs-4 fw-bold text-success m-0">{{ avg_daily_expenses }} ₸</p>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="d-flex justify-content-center my-4">
+    <div class="d-flex justify-content-center">
         <form method="get" class="mb-3 w-100" id="monthSelectForm" style="max-width: 400px;">
             <label for="monthSelect" class="form-label fw-semibold">Выберите месяц:</label>
             <select name="month" id="monthSelect" class="form-select" onchange="this.form.submit()">
@@ -84,5 +96,4 @@
         console.log("Data:", {{ pie_data|safe }});
     </script>
     </div>
-    <p></p>
 {% endblock content %}

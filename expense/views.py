@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 from .models import Expense, ExpenseCategory, ExpenseCategoryLimit
 from django.db.models import Sum
-from .forms import ExpenseForm, ExpenseCategoryForm, ExpenseCategoryLimitForm
+from .forms import ExpenseForm, ExpenseCategoryForm, ExpenseCategoryLimitForm, ExpenseCategoryFilterForm
 from django.urls import reverse_lazy
 from datetime import timedelta, datetime, date
 from django.db.models.functions import TruncMonth
@@ -19,7 +19,13 @@ class ExpenseListView(ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        return Expense.objects.all()
+        category_id = self.request.GET.get('category')
+        queryset = Expense.objects.all().order_by('-date')
+
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+
+        return queryset
     
     def get_total_expenses(self):
         return self.get_queryset().aggregate(total=Sum('amount'))['total'] or 0 
@@ -27,6 +33,7 @@ class ExpenseListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_expense"] = self.get_total_expenses()
+        context['categories'] = ExpenseCategory.objects.all()
         return context
 
 class ExpenseCreateView(CreateView):
@@ -118,6 +125,7 @@ class ExpenseCategoryPieView(TemplateView):
         day_in_month = calendar.monthrange(year, month)[1]
         avg_daily_expenses = round(total_monthly_expense / day_in_month, 2)
 
+        context['total_monthly_expense'] = total_monthly_expense
         context['avg_daily_expenses'] = avg_daily_expenses
         context['selected_month'] = f"{year:04d}-{month:02d}"
         context['month_options'] = month_options
