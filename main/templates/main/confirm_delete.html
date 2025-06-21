@@ -1,0 +1,13 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Удалить {{ item_type }}</h2>
+    <p>Вы уверены, что хотите удалить {{ item_type }} на сумму <strong>{{ object.amount }} ₸</strong> от {{ object.date|date:"Y-m-d" }}?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Удалить</button>
+        <a href="{% url cancel_url %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock content %}

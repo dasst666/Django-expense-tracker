@@ -66,8 +66,15 @@ class ExpenseCategoryCreateView(CreateView):
     
 class ExpenseDeleteView(DeleteView):
     model = Expense
-    template_name = "expense/expense_confirm_delete.html"
+    template_name = "main/confirm_delete.html"
     success_url = reverse_lazy('expense:expense_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["item_type"] = "расход"
+        context["cancel_url"] = "expense:expense_list"
+        return context
+    
 
 class ExpenseUpdateView(UpdateView):
     model = Expense

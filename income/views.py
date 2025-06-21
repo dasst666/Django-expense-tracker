@@ -42,8 +42,15 @@ class IncomeCreateView(CreateView):
 
 class IncomeDeleteView(DeleteView):
     model = Income
-    template_name = "income/income_confirm_delete.html"
+    template_name = "main/confirm_delete.html"
     success_url = reverse_lazy('income:income_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["item_type"] = "доход"
+        context["cancel_url"] = "income:income_list"
+        return context
+    
 
 class IncomeUpdateView(UpdateView):
     model = Income
