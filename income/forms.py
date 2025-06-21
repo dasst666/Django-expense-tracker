@@ -1,22 +1,12 @@
 from django import forms
 from .models import Income, IncomeCategory
-from bootstrap_datepicker_plus.widgets import DatePickerInput
+from main.forms import BaseTransactionForm, BaseTransactionCategoryForm
 
 class IncomeForm(forms.ModelForm):
-    class Meta:
+    class Meta(BaseTransactionForm.Meta):
         model = Income
-        fields = ['amount', 'date', 'category', 'note']
-        widgets = {
-            'date': DatePickerInput(
-                options={
-                    "format": "YYYY-MM-DD",
-                }
-            ),
-            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
-            'category': forms.Select(attrs={'class': 'form-select'}),
-        }
+        
 
 class IncomeCategoryForm(forms.ModelForm):
-    class Meta:
+    class Meta(BaseTransactionCategoryForm.Meta):
         model = IncomeCategory
-        fields = ['name']
