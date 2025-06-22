@@ -11,12 +11,18 @@ import calendar
 
 class IncomeListView(ListView):
     model = Income
-    template_name = "income_list.html"
-    context_object_name = 'incomes'
+    template_name = "main/list.html"
+    context_object_name = 'transactions'
     paginate_by = 5
 
     def get_queryset(self):
-        return Income.objects.all()
+        category_id = self.request.GET.get('category')
+        queryset = Income.objects.all().order_by('-date')
+
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+
+        return queryset
     
     def get_total_income(self):
         return self.get_queryset().aggregate(total=Sum('amount'))['total'] or 0
@@ -24,6 +30,11 @@ class IncomeListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['total_income'] = self.get_total_income()
+        context['categories'] = IncomeCategory.objects.all()
+        context['monthly_url'] = 'income:income_monthly'
+        context['type'] = 'доход'
+        context['delete_url'] = 'income:income_delete'
+        context['cancel_url'] = 'income:income_update'
         return context
 
 class IncomeCreateView(CreateView):
@@ -123,6 +134,6 @@ class IncomeMonthlyView(TemplateView):
     
     
 
-
+# TODO: надо написать исключение например такая категория уже создана
     
 

@@ -14,8 +14,8 @@ from django.shortcuts import redirect
 
 class ExpenseListView(ListView):
     model = Expense
-    template_name = "expense_list.html"
-    context_object_name = 'expenses'
+    template_name = "main/list.html"
+    context_object_name = 'transactions'
     paginate_by = 5
 
     def get_queryset(self):
@@ -34,6 +34,10 @@ class ExpenseListView(ListView):
         context = super().get_context_data(**kwargs)
         context["total_expense"] = self.get_total_expenses()
         context['categories'] = ExpenseCategory.objects.all()
+        context['monthly_url'] = 'expense:expense_monthly'
+        context['type'] = 'расход'
+        context['delete_url'] = 'expense:expense_delete'
+        context['cancel_url'] = 'expense:expense_update'
         return context
 
 class ExpenseCreateView(CreateView):
