@@ -39,12 +39,13 @@ class ExpenseListView(ListView):
 class ExpenseCreateView(CreateView):
     model = Expense
     form_class = ExpenseForm
-    template_name = "expense/expense_form.html"
+    template_name = "main/create_form.html"
     success_url = reverse_lazy('expense:expense_add')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = 'Add Expense'
+        context["category_url"] = 'expense:expense_category_add'
         return context
 
     def form_valid(self, form):
@@ -53,12 +54,14 @@ class ExpenseCreateView(CreateView):
 class ExpenseCategoryCreateView(CreateView):
     model = ExpenseCategory
     form_class = ExpenseCategoryForm
-    template_name = "expense/expense_category_form.html"
+    template_name = "main/create_category_form.html"
     success_url = reverse_lazy('expense:expense_category_add')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = 'Add Expense Category'
+        context['type'] = 'expense'
+        context['back_url'] = 'expense:expense_add'
         return context
     
     def form_valid(self, form):

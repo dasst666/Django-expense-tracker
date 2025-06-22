@@ -21,14 +21,19 @@
         </div>
         <div class="mb-3">
             <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
-            {{ form.category }}
+            <div class="d-flex">
+                {{ form.category }}
+                <a href="{% url category_url %}" class="btn btn-outline-secondary" title="Добавить категорию">
+                    <i class="bi bi-plus-lg"></i> <!-- Bootstrap icon -->
+                </a>
+            </div>
         </div>
         <div class="mb-3">
             <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
             {{ form.date }}
         </div>
         <div class="mb-3">
-            <label for="{{ form.note.id_for_label }}" class="form-label">Комментарий</label>
+            <label for="{{ form.note.id_for_label }}" class="form-label">Note</label>
             <input type="text" class="form-control form-stylereg" id="id_note"
             value="{% if form.note.value %}{{ form.note.value }}{% endif %}"
             name="note" placeholder="Your Note">

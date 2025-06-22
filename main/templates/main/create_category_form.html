@@ -5,7 +5,7 @@
 <div class="container mt-5">
     <!-- Кнопка "Назад" -->
     <div class="mb-4">
-        <a href="{% url "expense:expense_limit" %}" class="btn btn-outline-secondary">
+        <a href="{% url back_url %}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i>
         </a>
     </div>
@@ -15,7 +15,7 @@
         <div class="mb-3">
             <label for="id_name" class="form-label form-stylereg">Category</label>
             <input type="text" class="form-control form-stylereg" id="id_name"
-            value="{% if form.expense.name.value %}{{ form.expense.name.value }}{% endif %}"
+            value="{% if form.type.name.value %}{{ form.type.name.value }}{% endif %}"
             name="name" placeholder="Your Category" required>
         </div>
         <button type="submit" class="btn btn-primary w-100">Сохранить</button>
