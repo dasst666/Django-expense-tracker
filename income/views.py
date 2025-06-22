@@ -7,35 +7,23 @@ from .forms import IncomeForm, IncomeCategoryForm
 from datetime import date
 from django.db.models.functions import TruncMonth
 import calendar
-from main.views import BaseMonthlyView, BaseListView, BaseTransactionCreateView
+from main.views import BaseMonthlyView, BaseListView, BaseTransactionCreateView, BaseCategoryCreateView
 
+class IncomeNamespaceMixin:
+    urls_namespace = 'income'
 
 class IncomeListView(BaseListView):
     model = Income
     category_model = IncomeCategory
     type_label = 'доход'
-    urls_namespace = 'income'
 
 class IncomeCreateView(BaseTransactionCreateView):
     model = Income
     form_class = IncomeForm
-    urls_namespace = 'income'
 
-class IncomeCategoryCreateView(CreateView):
+class IncomeCategoryCreateView(BaseCategoryCreateView):
     model = IncomeCategory
     form_class = IncomeCategoryForm
-    template_name = "main/create_category_form.html"
-    sucess_url = reverse_lazy('income:income_category_add')
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["type"] = 'income' 
-        context["back_url"] = 'income:income_add'
-        context["title"] = 'Add Income Category'
-        return context
-    
-    def form_valid(self, form):
-        return super().form_valid(form)
 
 class IncomeDeleteView(DeleteView):
     model = Income

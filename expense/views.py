@@ -10,34 +10,23 @@ import calendar
 from django.utils.timezone import now
 from django.contrib import messages
 from django.shortcuts import redirect
-from main.views import BaseMonthlyView, BaseListView, BaseTransactionCreateView
+from main.views import BaseMonthlyView, BaseListView, BaseTransactionCreateView, BaseCategoryCreateView
 
-class ExpenseListView(BaseListView):
+class ExpenseNamespaceMixin:
+    urls_namespace = 'expense'
+
+class ExpenseListView(ExpenseNamespaceMixin, BaseListView):
     model = Expense
     category_model = ExpenseCategory
     type_label = 'расход'
-    urls_namespace = 'expense'
 
-class ExpenseCreateView(BaseTransactionCreateView):
+class ExpenseCreateView(ExpenseNamespaceMixin, BaseTransactionCreateView):
     model = Expense
     form_class = ExpenseForm
-    urls_namespace = 'expense'
 
-class ExpenseCategoryCreateView(CreateView):
+class ExpenseCategoryCreateView(ExpenseNamespaceMixin, BaseCategoryCreateView):
     model = ExpenseCategory
     form_class = ExpenseCategoryForm
-    template_name = "main/create_category_form.html"
-    success_url = reverse_lazy('expense:expense_category_add')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = 'Add Expense Category'
-        context['type'] = 'expense'
-        context['back_url'] = 'expense:expense_add'
-        return context
-    
-    def form_valid(self, form):
-        return super().form_valid(form)
     
 class ExpenseDeleteView(DeleteView):
     model = Expense

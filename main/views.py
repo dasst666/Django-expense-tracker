@@ -130,3 +130,24 @@ class BaseTransactionCreateView(CreateView):
     def form_valid(self, form):
         return super().form_valid(form)
 
+class BaseCategoryCreateView(CreateView):
+    model = None
+    form_class = None
+    urls_namespace = ''
+    template_name = "main/create_category_form.html"
+
+    def get_success_url(self):
+        return reverse(f'{self.urls_namespace}:{self.urls_namespace}_category_add')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            "title": f'Add {self.urls_namespace.title()} Category',
+            'type': self.urls_namespace,
+            'back_url': f'{self.urls_namespace}:{self.urls_namespace}_add',
+        })
+        return context
+    
+    def form_valid(self, form):
+        return super().form_valid(form)
