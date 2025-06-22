@@ -10,50 +10,18 @@ import calendar
 from django.utils.timezone import now
 from django.contrib import messages
 from django.shortcuts import redirect
+from main.views import BaseMonthlyView, BaseListView, BaseTransactionCreateView
 
-
-class ExpenseListView(ListView):
+class ExpenseListView(BaseListView):
     model = Expense
-    template_name = "main/list.html"
-    context_object_name = 'transactions'
-    paginate_by = 5
+    category_model = ExpenseCategory
+    type_label = 'расход'
+    urls_namespace = 'expense'
 
-    def get_queryset(self):
-        category_id = self.request.GET.get('category')
-        queryset = Expense.objects.all().order_by('-date')
-
-        if category_id:
-            queryset = queryset.filter(category_id=category_id)
-
-        return queryset
-    
-    def get_total_expenses(self):
-        return self.get_queryset().aggregate(total=Sum('amount'))['total'] or 0 
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["total_expense"] = self.get_total_expenses()
-        context['categories'] = ExpenseCategory.objects.all()
-        context['monthly_url'] = 'expense:expense_monthly'
-        context['type'] = 'расход'
-        context['delete_url'] = 'expense:expense_delete'
-        context['cancel_url'] = 'expense:expense_update'
-        return context
-
-class ExpenseCreateView(CreateView):
+class ExpenseCreateView(BaseTransactionCreateView):
     model = Expense
     form_class = ExpenseForm
-    template_name = "main/create_form.html"
-    success_url = reverse_lazy('expense:expense_add')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = 'Add Expense'
-        context["category_url"] = 'expense:expense_category_add'
-        return context
-
-    def form_valid(self, form):
-        return super().form_valid(form)
+    urls_namespace = 'expense'
 
 class ExpenseCategoryCreateView(CreateView):
     model = ExpenseCategory
@@ -147,45 +115,9 @@ class ExpenseCategoryPieView(TemplateView):
         context['pie_data'] = pie_data
         return context
     
-class ExpenseMonthlyView(TemplateView):
+class ExpenseMonthlyView(BaseMonthlyView):
     model = Expense
-    template_name = "expense/expense_monthly.html"
-    success_url = reverse_lazy('expese:expense_monthly')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # Monthly total expenses like month: January, total: 200000
-        current_year = date.today().year
-        expense = Expense.objects.filter(date__year=current_year)
-        monthly_expenses = (
-            expense
-            .annotate(month=TruncMonth('date'))
-            .values('month')
-            .annotate(total=Sum('amount'))
-        )
-        # Calculating avg monthly expenses for this year
-        total_year_expenses = sum(item['total'] for item in monthly_expenses)
-        month_count = len(monthly_expenses)
-        avg_year_expenses = round(total_year_expenses/month_count, 2) if month_count > 0 else 0
-        # Monthly total expenses sorted for plot
-        monthly_expenses_for_plot = (
-            monthly_expenses
-            .order_by('month')
-        )
-        labels = []
-        data = []
-        for entry in monthly_expenses_for_plot:
-            month_date = entry['month']
-            month_name = calendar.month_name[month_date.month]
-            labels.append(month_name)
-            data.append(float(entry['total']))
-
-        context['avg_year_expenses'] = avg_year_expenses
-        context['monthly_expenses_for_plot'] = monthly_expenses_for_plot
-        context['labels'] = labels
-        context['data'] = data
-        return context
+    type_label = 'расход'
 
 class ExpenseCategoryLimitCreateView(CreateView):
     model = ExpenseCategoryLimit

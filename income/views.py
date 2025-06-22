@@ -7,50 +7,19 @@ from .forms import IncomeForm, IncomeCategoryForm
 from datetime import date
 from django.db.models.functions import TruncMonth
 import calendar
+from main.views import BaseMonthlyView, BaseListView, BaseTransactionCreateView
 
 
-class IncomeListView(ListView):
+class IncomeListView(BaseListView):
     model = Income
-    template_name = "main/list.html"
-    context_object_name = 'transactions'
-    paginate_by = 5
+    category_model = IncomeCategory
+    type_label = 'доход'
+    urls_namespace = 'income'
 
-    def get_queryset(self):
-        category_id = self.request.GET.get('category')
-        queryset = Income.objects.all().order_by('-date')
-
-        if category_id:
-            queryset = queryset.filter(category_id=category_id)
-
-        return queryset
-    
-    def get_total_income(self):
-        return self.get_queryset().aggregate(total=Sum('amount'))['total'] or 0
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['total_income'] = self.get_total_income()
-        context['categories'] = IncomeCategory.objects.all()
-        context['monthly_url'] = 'income:income_monthly'
-        context['type'] = 'доход'
-        context['delete_url'] = 'income:income_delete'
-        context['cancel_url'] = 'income:income_update'
-        return context
-
-class IncomeCreateView(CreateView):
+class IncomeCreateView(BaseTransactionCreateView):
     model = Income
     form_class = IncomeForm
-    template_name = "main/create_form.html"
-    success_url = reverse_lazy('income:income_add')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Add Income'
-        context['category_url'] = 'income:income_category_add'
-        return context
-    
-    def form_valid(self, form):
-        return super().form_valid(form)
+    urls_namespace = 'income'
 
 class IncomeCategoryCreateView(CreateView):
     model = IncomeCategory
@@ -91,47 +60,9 @@ class IncomeUpdateView(UpdateView):
         context['title'] = f'Изменить? {self.object.category} {self.object.amount}'
         return context
 
-class IncomeMonthlyView(TemplateView):
+class IncomeMonthlyView(BaseMonthlyView):
     model = Income
-    template_name = "income/income_monthly.html"
-    success_url = reverse_lazy('income:income_monthly')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        current_year = date.today().year
-        income = Income.objects.filter(date__year=current_year)
-        monthly_incomes = (
-            income
-            .annotate(month=TruncMonth('date'))
-            .values('month')
-            .annotate(total=Sum('amount'))
-        )
-        total_year_incomes = sum(item['total'] for item in monthly_incomes)
-        month_count = len(monthly_incomes)
-        avg_year_incomes = round(total_year_incomes/month_count, 2) if month_count > 0 else 0
-
-        monthly_incomes_for_plot = (
-            monthly_incomes
-            .order_by('month')
-        )
-        labels = []
-        data = []
-        for entry in monthly_incomes_for_plot:
-            month_date = entry['month']
-            month_name = calendar.month_name[month_date.month]
-            labels.append(month_name)
-            data.append(float(entry['total']))
-
-        context['avg_year_incomes'] = avg_year_incomes
-        context['monthly_incomes_for_plot'] = monthly_incomes_for_plot
-        context['labels'] = labels
-        context['data'] = data
-        return context
-    
-
-
-    
+    type_label = 'доход'
     
 
 # TODO: надо написать исключение например такая категория уже создана

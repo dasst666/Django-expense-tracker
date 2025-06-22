@@ -15,9 +15,13 @@
         {% csrf_token %}
         <div class="mb-3">
             <label for="id_amount" class="form-label form-stylereg">Amount</label>
-            <input type="text" class="form-control form-stylereg" id="id_amount"
+            {% comment %} <input type="text" class="form-control form-stylereg" id="id_amount"
             value="{% if form.amount.value %}{{ form.amount.value }}{% endif %}"
-            name="amount" placeholder="Your Amount" required>
+            name="amount" placeholder="Your Amount" required> {% endcomment %}
+            {{ form.amount }}
+            {% if form.amount.errors %}
+                <div class="text-danger">{{ form.amount.errors }}</div>
+            {% endif %}
         </div>
         <div class="mb-3">
             <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
@@ -31,6 +35,9 @@
         <div class="mb-3">
             <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
             {{ form.date }}
+            {% if form.date.errors %}
+                <div class="text-danger">{{ form.date.errors }}</div>
+            {% endif %}
         </div>
         <div class="mb-3">
             <label for="{{ form.note.id_for_label }}" class="form-label">Note</label>
@@ -41,5 +48,19 @@
         <button type="submit" class="btn btn-primary w-100">Сохранить</button>
     </form>
 </div>
+{% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
 {% endblock content %}
 
