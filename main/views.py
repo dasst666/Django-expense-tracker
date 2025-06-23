@@ -1,16 +1,18 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Category, Transaction
-from django.core.paginator import Paginator
-
-from income.models import Income
-from expense.models import Expense
 from django.db.models import Sum
 from django.views.generic import TemplateView, ListView, CreateView
 from django.utils import timezone
-from datetime import timedelta, datetime, date
-from django.db.models.functions import TruncMonth
-import calendar
+from django.core.paginator import Paginator
 from django.urls import reverse
+from django.contrib import messages
+from django.db.models.functions import TruncMonth
+from .models import Category, Transaction
+from income.models import Income
+from expense.models import Expense
+from datetime import timedelta, datetime, date
+import calendar
+from django.db import IntegrityError, transaction
+
 
 class DashboardView(TemplateView):
     template_name = "main/dashboard.html"
@@ -27,11 +29,12 @@ class DashboardView(TemplateView):
         total_expense = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
         balance = total_income - total_expense
 
-        context['total_last_7_days_expenses'] = total_last_7_days_expenses
-        context["total_income"] = total_income
-        context["total_expense"] = total_expense
-        context["balance"] = balance
-
+        context.update({
+            'total_last_7_days_expenses': round(total_last_7_days_expenses, 2),
+            'total_income': round(total_income, 2),
+            'total_expense': round(total_expense, 2),
+            'balance': round(balance, 2),
+        })
         return context
 
 class BaseListView(ListView):
@@ -116,7 +119,6 @@ class BaseTransactionCreateView(CreateView):
     form_class = None
     urls_namespace = ''
     template_name = "main/create_form.html"
-
     def get_success_url(self):
         return reverse(f'{self.urls_namespace}:{self.urls_namespace}_add')
 
@@ -149,5 +151,9 @@ class BaseCategoryCreateView(CreateView):
         })
         return context
     
-    def form_valid(self, form):
-        return super().form_valid(form)
+    def form_invalid(self, form):
+        name_errors = form.errors.get('name')
+        if name_errors:
+            for error in name_errors:
+                messages.warning(self.request, f"Ошибка: категория с таким именем уже существует.")
+        return super().form_invalid(form)

@@ -2,11 +2,11 @@ from django import forms
 from .models import Income, IncomeCategory
 from main.forms import BaseTransactionForm, BaseTransactionCategoryForm
 
-class IncomeForm(forms.ModelForm):
+class IncomeForm(BaseTransactionForm):
     class Meta(BaseTransactionForm.Meta):
         model = Income
         
 
-class IncomeCategoryForm(forms.ModelForm):
+class IncomeCategoryForm(BaseTransactionCategoryForm):
     class Meta(BaseTransactionCategoryForm.Meta):
         model = IncomeCategory

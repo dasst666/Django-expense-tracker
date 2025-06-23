@@ -1,27 +1,22 @@
-from django.shortcuts import render
 from django.views.generic import ListView, CreateView, DeleteView, UpdateView, TemplateView
-from .models import Income, IncomeCategory
-from django.db.models import Sum
 from django.urls import reverse_lazy
+from .models import Income, IncomeCategory
 from .forms import IncomeForm, IncomeCategoryForm
-from datetime import date
-from django.db.models.functions import TruncMonth
-import calendar
 from main.views import BaseMonthlyView, BaseListView, BaseTransactionCreateView, BaseCategoryCreateView
 
 class IncomeNamespaceMixin:
     urls_namespace = 'income'
 
-class IncomeListView(BaseListView):
+class IncomeListView(IncomeNamespaceMixin, BaseListView):
     model = Income
     category_model = IncomeCategory
     type_label = 'доход'
 
-class IncomeCreateView(BaseTransactionCreateView):
+class IncomeCreateView(IncomeNamespaceMixin, BaseTransactionCreateView):
     model = Income
     form_class = IncomeForm
 
-class IncomeCategoryCreateView(BaseCategoryCreateView):
+class IncomeCategoryCreateView(IncomeNamespaceMixin, BaseCategoryCreateView):
     model = IncomeCategory
     form_class = IncomeCategoryForm
 
@@ -35,7 +30,6 @@ class IncomeDeleteView(DeleteView):
         context["item_type"] = "доход"
         context["cancel_url"] = "income:income_list"
         return context
-    
 
 class IncomeUpdateView(UpdateView):
     model = Income
@@ -54,5 +48,7 @@ class IncomeMonthlyView(BaseMonthlyView):
     
 
 # TODO: надо написать исключение например такая категория уже создана
+# TODO: логирование если что
+
     
 

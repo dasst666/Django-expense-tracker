@@ -20,6 +20,13 @@ class BaseTransactionForm(forms.ModelForm):
             'category': forms.Select(attrs={'class': 'form-select'}),
         }
 
+    def clean_amount(self):
+        amount = self.cleaned_data['amount']
+        print(f"[DEBUG] Валидация amount: {amount}")
+        if amount <= 0:
+            raise forms.ValidationError("Сумма должна быть больше 0.")
+        return amount
+
 class BaseTransactionCategoryForm(forms.ModelForm):
     class Meta:
         fields = ['name']

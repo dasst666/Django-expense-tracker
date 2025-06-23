@@ -2,11 +2,11 @@ from django import forms
 from .models import Expense, ExpenseCategory, ExpenseCategoryLimit
 from main.forms import BaseTransactionForm, BaseTransactionCategoryForm
 
-class ExpenseForm(forms.ModelForm):
+class ExpenseForm(BaseTransactionForm):
     class Meta(BaseTransactionForm.Meta):
         model = Expense
 
-class ExpenseCategoryForm(forms.ModelForm):
+class ExpenseCategoryForm(BaseTransactionCategoryForm):
     class Meta(BaseTransactionCategoryForm.Meta):
         model = ExpenseCategory
 

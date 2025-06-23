@@ -1,16 +1,19 @@
 from django.shortcuts import render
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
-from .models import Expense, ExpenseCategory, ExpenseCategoryLimit
-from django.db.models import Sum
-from .forms import ExpenseForm, ExpenseCategoryForm, ExpenseCategoryLimitForm, ExpenseCategoryFilterForm
-from django.urls import reverse_lazy
-from datetime import timedelta, datetime, date
 from django.db.models.functions import TruncMonth
-import calendar
 from django.utils.timezone import now
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.db.models import Sum
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
+from .models import Expense, ExpenseCategory, ExpenseCategoryLimit
+from .forms import ExpenseForm, ExpenseCategoryForm, ExpenseCategoryLimitForm
+from datetime import datetime
 from main.views import BaseMonthlyView, BaseListView, BaseTransactionCreateView, BaseCategoryCreateView
+import calendar
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ExpenseNamespaceMixin:
     urls_namespace = 'expense'
@@ -38,7 +41,6 @@ class ExpenseDeleteView(DeleteView):
         context["item_type"] = "расход"
         context["cancel_url"] = "expense:expense_list"
         return context
-    
 
 class ExpenseUpdateView(UpdateView):
     model = Expense
@@ -141,29 +143,45 @@ class ExpenseCategoryLimitStatusView(TemplateView):
         year = today.year
         month = today.month
 
-        limits = ExpenseCategoryLimit.objects.filter(month__year=year, month__month=month)
+        try:
+            limits = ExpenseCategoryLimit.objects.filter(month__year=year, month__month=month)
+            if not limits.exists():
+                messages.warning(self.request, "На этот месяц нет установленных лимитов по категориям.")
+                context['category_statuses'] = []
+                return context
 
-        expenses = (
-            Expense.objects
-            .filter(date__year=year, date__month=month)
-            .values('category')
-            .annotate(total_spent=Sum('amount'))
-        )
-        expense_dict = {item['category']: item['total_spent'] for item in expenses}
-        
-        category_statuses = []
-        for limit in limits:
-            spent = expense_dict.get(limit.category.id, 0)
-            percent = round((spent/limit.limit) * 100) if limit.limit else 0
-            category_statuses.append({
-                'category': limit.category.name,
-                'limit': limit.limit,
-                'spent': spent,
-                'percent': percent,
-                'limit_obj': limit 
-            })
+            expenses = (
+                Expense.objects
+                .filter(date__year=year, date__month=month)
+                .values('category')
+                .annotate(total_spent=Sum('amount'))
+            )
+            expense_dict = {item['category']: item['total_spent'] for item in expenses}
+            
+            category_statuses = []
+            for limit in limits:
+                spent = expense_dict.get(limit.category.id, 0)
+                try:
+                    percent = round((spent / limit.limit) * 100)
+                except ZeroDivisionError:
+                    percent = 0
+                    logger.warning(f"Деление на ноль в лимите категории: {limit.category}")
+                    messages.warning(self.request, f"Лимит категории '{limit.category}' равен 0 — деление на ноль.")
 
-        context['category_statuses'] = category_statuses
+                category_statuses.append({
+                    'category': limit.category.name,
+                    'limit': limit.limit,
+                    'spent': spent,
+                    'percent': percent,
+                    'limit_obj': limit 
+                })
+
+            context['category_statuses'] = category_statuses
+        except Exception as e:
+            logger.exception("Ошибка при загрузке лимитов расходов:")
+            context['error'] = "Произошла ошибка при загрузке данных. Пожалуйста, попробуйте позже."
+            context['category_statuses'] = []
+
         return context
     
 class ExpenseCategoryLimitUpdateView(UpdateView):
