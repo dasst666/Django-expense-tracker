@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'income',
     'bootstrap_datepicker_plus',
     'expense',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +132,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # LANGUAGE_CODE = 'ru'
 # USE_L10N = True
+
+AUTH_USER_MODEL = 'users.CustomUser'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

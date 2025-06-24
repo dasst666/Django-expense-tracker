@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
 class ExpenseCategory(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -18,6 +19,7 @@ class ExpenseCategory(models.Model):
     
 
 class Expense(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     category = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE, related_name='expenses')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(default=timezone.now)

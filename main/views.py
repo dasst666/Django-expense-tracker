@@ -6,15 +6,16 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.contrib import messages
 from django.db.models.functions import TruncMonth
+from django.db import IntegrityError, transaction
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Category, Transaction
 from income.models import Income
 from expense.models import Expense
 from datetime import timedelta, datetime, date
 import calendar
-from django.db import IntegrityError, transaction
 
 
-class DashboardView(TemplateView):
+class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "main/dashboard.html"
 
     def get_context_data(self, **kwargs):
@@ -130,6 +131,7 @@ class BaseTransactionCreateView(CreateView):
         return context
     
     def form_valid(self, form):
+        form.instance.user = self.request.user
         return super().form_valid(form)
 
 class BaseCategoryCreateView(CreateView):
